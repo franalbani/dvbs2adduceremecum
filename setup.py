@@ -22,8 +22,9 @@ setup(
     packages=[
         'dvbs2adduceremecum'
         ],
-    # install_requires=[
-    #     ],
+    install_requires=[
+        'attrs',
+        ],
     #   scripts=[
     #       ],
     #   data_files=[
