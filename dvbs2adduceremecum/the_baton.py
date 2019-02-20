@@ -13,15 +13,15 @@ def frame_len(short_frame=False):
 
 def S(modcod, short_frame=False):
     if short_frame:
-        return {'2': 90,
-                '3': 60,
-                '4': 45,
-                '5': 36}[modcod.order]
+        return {2: 90,
+                3: 60,
+                4: 45,
+                5: 36}[modcod.order]
     else:
-        return {'2': 360,
-                '3': 240,
-                '4': 180,
-                '5': 144}[modcod.order]
+        return {2: 360,
+                3: 240,
+                4: 180,
+                5: 144}[modcod.order]
 
 
 def bch_t(modcod, short_frame=False):
