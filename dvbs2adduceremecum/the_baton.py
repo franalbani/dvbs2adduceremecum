@@ -120,9 +120,6 @@ def user_bits_per_hertz(modcod, conf):
 
     eff = 1
 
-    # TS
-    eff *= 184/188
-
     k = bits_per_bbframe(modcod, conf.short_frame)
 
     # Mode adaptation
