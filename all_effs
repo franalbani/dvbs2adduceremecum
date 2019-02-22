@@ -4,10 +4,7 @@
 from dvbs2adduceremecum.the_baton import ModCod, Conf, user_bits_per_hertz, MOD_ORDERS, LDPC_RATES
 
 
-PILOTS = False
-SHORT_FRAME = False
 ROLL_OFF = 0.2
-conf = Conf(PILOTS, SHORT_FRAME, ROLL_OFF)
 
 
 def eff_wrapper(modcod, conf):
@@ -19,27 +16,36 @@ def eff_wrapper(modcod, conf):
 
     return eff
 
-print(conf)
 
-table = '|   |'
+def md_table(conf):
 
-for rate in LDPC_RATES:
-    table += '\t%1d /%2d |' % (rate.numerator, rate.denominator)
+    print(conf)
 
-table += '\n'
+    table = '|   |'
 
-table += '| - |'
-
-for rate in LDPC_RATES:
-    table += '\t----- |'
-
-table += '\n'
-
-for order in MOD_ORDERS:
-    table += '| %1d |' % order
     for rate in LDPC_RATES:
-        eff = eff_wrapper(ModCod(order, rate), conf)
-        table += '\t%1.3f |' % eff
+        table += '\t%1d /%2d |' % (rate.numerator, rate.denominator)
+
     table += '\n'
 
-print(table)
+    table += '| - |'
+
+    for rate in LDPC_RATES:
+        table += '\t----- |'
+
+    table += '\n'
+
+    for order in MOD_ORDERS:
+        table += '| %1d |' % order
+        for rate in LDPC_RATES:
+            eff = eff_wrapper(ModCod(order, rate), conf)
+            table += '\t%1.3f |' % eff
+        table += '\n'
+
+    return table
+
+
+print(md_table(Conf(pilots=False, short_frame=False, roll_off=ROLL_OFF)))
+print(md_table(Conf(pilots=True,  short_frame=False, roll_off=ROLL_OFF)))
+print(md_table(Conf(pilots=False, short_frame=True,  roll_off=ROLL_OFF)))
+print(md_table(Conf(pilots=True,  short_frame=True,  roll_off=ROLL_OFF)))
