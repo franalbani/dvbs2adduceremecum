@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from dvbs2adduceremecum.the_baton import ModCod, Conf, efficiency, MOD_ORDERS, LDPC_RATES
+from dvbs2adduceremecum.the_baton import ModCod, Conf, user_bits_per_hertz, MOD_ORDERS, LDPC_RATES
 
 
 PILOTS = False
 SHORT_FRAME = False
-ROLL_OFF = 0
+ROLL_OFF = 0.2
 conf = Conf(PILOTS, SHORT_FRAME, ROLL_OFF)
 
 
 def eff_wrapper(modcod, conf):
     eff = 0
     try:
-        eff = efficiency(modcod, conf)
+        eff = user_bits_per_hertz(modcod, conf)
     except ValueError as e:
         eff = 0
 
     return eff
 
+print(conf)
 
 table = '|   |'
 

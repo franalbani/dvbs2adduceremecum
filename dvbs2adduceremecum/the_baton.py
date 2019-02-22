@@ -9,14 +9,20 @@ LDPC_RATES = [F(1, 4), F(1, 3), F(2, 5), F(1, 2), F(3, 5), F(2, 3), F(3, 4),
               F(4, 5), F(5, 6), F(8, 9), F(9, 10)]
 
 
-def frame_len(short_frame=False):
+def bits_per_fecframe(short_frame=False):
+    '''
+    Called n_ldpc in the standard.
+    '''
     if short_frame:
         return 16200
     else:
         return 64800
 
 
-def S(modcod, short_frame=False):
+def slots_per_plframe(modcod, short_frame=False):
+    '''
+    # of payload slots per PLFRAME. See page 31 of standard.
+    '''
     if short_frame:
         return {2: 90,
                 3: 60,
@@ -31,7 +37,7 @@ def S(modcod, short_frame=False):
 
 def bch_t(modcod, short_frame=False):
     '''
-    BCH t error correction
+    BCH t error correction. See page 22 and 23 of standard.
     '''
     t = 12
     if not short_frame:
@@ -46,10 +52,17 @@ def bch_t(modcod, short_frame=False):
 
 
 def bch_poly_order(short_frame=False):
+    '''
+    See page 23 of standard.
+    '''
     return 14 if short_frame else 16
 
 
 def eff_ldpc_rate(modcod, short_frame=False):
+    '''
+    Effective LDPC rate. For short frames, may differ from
+    the LDPC "code identifier". See page 23 of standard.
+    '''
     if short_frame:
         return {F(1, 4): F(1, 5),
                 F(1, 3): F(1, 3),
@@ -65,11 +78,14 @@ def eff_ldpc_rate(modcod, short_frame=False):
         return modcod.ldpc_rate
 
 
-def K_bch(modcod, short_frame=False):
+def bits_per_bbframe(modcod, short_frame=False):
+    '''
+    Called K_bch in the standard. See page 22.
+    '''
     t = bch_t(modcod, short_frame)
     inner_rate = eff_ldpc_rate(modcod, short_frame)
 
-    K = (frame_len(short_frame) * inner_rate) - t*bch_poly_order(short_frame)
+    K = (bits_per_fecframe(short_frame) * inner_rate) - t*bch_poly_order(short_frame)
     assert K.denominator == 1
     return int(K)
 
@@ -97,7 +113,7 @@ class Conf:
     roll_off = attrib(type=float, default=0.2)
 
 
-def efficiency(modcod, conf):
+def user_bits_per_hertz(modcod, conf):
     '''
     User bits per Hz.
     '''
@@ -107,7 +123,7 @@ def efficiency(modcod, conf):
     # TS
     eff *= 184/188
 
-    k = K_bch(modcod, conf.short_frame)
+    k = bits_per_bbframe(modcod, conf.short_frame)
 
     # Mode adaptation
     eff *= (1 - 80 / k)
@@ -116,18 +132,18 @@ def efficiency(modcod, conf):
     # eff *= 1
 
     # FECFRAME
-    eff *= k / frame_len(conf.short_frame)
+    eff *= k / bits_per_fecframe(conf.short_frame)
 
-    # Now bits are packed to symbols...
+    # Now bits are packed into symbols...
 
     # XFECFRAME
     eff *= modcod.order
 
     # Physical layer framing
-    s = S(modcod, conf.short_frame)
-    pl = 90*(s + 1)
+    s = slots_per_plframe(modcod, conf.short_frame)
+    pl = 90 * (s + 1)
     if conf.pilots:
-        pl += 36*int((s-1)/16)
+        pl += 36 * int((s - 1)/16)
 
     eff *= 90 * s / pl
 
