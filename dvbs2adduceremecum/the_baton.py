@@ -8,7 +8,8 @@ MOD_ORDERS = [2, 3, 4, 5]
 LDPC_RATES = [F(1, 4), F(1, 3), F(2, 5), F(1, 2), F(3, 5), F(2, 3), F(3, 4),
               F(4, 5), F(5, 6), F(8, 9), F(9, 10)]
 
-ESN0_min_dB = {
+# This values are for 10^-7 TS PER
+EsN0_min_dB = {
     # QPSK
     (2, F(1,  4)): -2.35,
     (2, F(1,  3)): -1.24,
@@ -30,17 +31,17 @@ ESN0_min_dB = {
     (3, F(9, 10)): 10.98,
     # 16-APSK
     (4, F(2,  3)):  8.97,
-    (4, F(3,  4)):  10.21,
-    (4, F(4,  5)):  11.03,
-    (4, F(5,  6)):  11.61,
-    (4, F(8,  9)):  12.89,
-    (4, F(9, 10)):  13.13,
+    (4, F(3,  4)): 10.21,
+    (4, F(4,  5)): 11.03,
+    (4, F(5,  6)): 11.61,
+    (4, F(8,  9)): 12.89,
+    (4, F(9, 10)): 13.13,
     # 32-APSK
-    (5, F(3,  4)):  12.73,
-    (5, F(4,  5)):  13.64,
-    (5, F(5,  6)):  14.28,
-    (5, F(8,  9)):  15.69,
-    (5, F(9, 10)):  16.05,
+    (5, F(3,  4)): 12.73,
+    (5, F(4,  5)): 13.64,
+    (5, F(5,  6)): 14.28,
+    (5, F(8,  9)): 15.69,
+    (5, F(9, 10)): 16.05,
     }
  
 
@@ -130,18 +131,13 @@ class ModCod:
     order = attrib(type=int)
     ldpc_rate = attrib(type=F)
 
-    @order.validator
-    def check_order(self, attribute, value):
-        if not value in MOD_ORDERS:
-            raise ValueError('ModCod order must be in %r.' % MOD_ORDERS)
-
-    @ldpc_rate.validator
-    def check_ldpc_rate(self, attribute, value):
-        if not value in LDPC_RATES:
-            raise ValueError('LDPC rate must be in %r.' % LDPC_RATES)
- 
-    def esno_min_dB(self):
-        return ESNO_min_dB[(self.order, self.ldpc_rate)]
+    def __attrs_post_init__(self):
+        try:
+            EsN0_min_dB[(self.order, self.ldpc_rate)]
+        except KeyError as ke:
+            n, d = self.ldpc_rate.numerator, self.ldpc_rate.denominator
+            raise ValueError('ModCod(%d, %2d / %2d) does not exist.'
+                              % (self.order, n, d))
 
 
 @attrs
