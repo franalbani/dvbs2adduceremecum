@@ -133,7 +133,7 @@ class ModCod:
 
     def __attrs_post_init__(self):
         try:
-            EsN0_min_dB[(self.order, self.ldpc_rate)]
+            self.esno_min_dB = EsN0_min_dB[(self.order, self.ldpc_rate)]
         except KeyError as ke:
             n, d = self.ldpc_rate.numerator, self.ldpc_rate.denominator
             raise ValueError('ModCod(%d, %2d / %2d) does not exist.'

@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import matplotlib.pyplot as plt
+from dvbs2adduceremecum.the_baton import ModCod, Conf, user_bits_per_hertz, MOD_ORDERS, LDPC_RATES
+
+
+ROLL_OFF = 0.2
+conf = Conf(pilots=False, short_frame=False, roll_off=ROLL_OFF)
+
+
+COLORS = {2: 'red', 3: 'orange', 4: 'blue', 5: 'lightgreen'}
+
+plt.figure(figsize=(10, 10), dpi=80)
+
+for order in MOD_ORDERS:
+    for rate in LDPC_RATES:
+        try:
+            modcod = ModCod(order, rate)
+            eff = user_bits_per_hertz(modcod, conf)
+            esno = modcod.esno_min_dB
+            plt.plot(esno, eff, 'o',
+                     color=COLORS[order],
+                     label='%d - %2d / %2d' % (order, rate.numerator, rate.denominator))
+        except ValueError as ve:
+            pass 
+
+
+plt.title(conf.__repr__())
+plt.xlabel('EsN0 min [dB]')
+plt.ylabel('Spectral Efficiency [user bits / Hz]')
+plt.grid(True)
+plt.legend()
+plt.savefig('eff_vs_esno.png', bbox_inches='tight')
+plt.show()

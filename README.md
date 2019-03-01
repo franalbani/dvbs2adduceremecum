@@ -6,6 +6,8 @@ Inspired by [drmpeg's dvbs2rate.c](https://github.com/drmpeg/dtv-utils/blob/mast
 
 ## Efficiency in "user bits per Hertz":
 
+![Spectral Efficiency vs. EsN0](eff_vs_esno.png "Spectral Efficiency vs. EsN0")
+
 ### `Conf(pilots=False, short_frame=False, roll_off=0.2)`
 
 |   |	1 / 4 |	1 / 3 |	2 / 5 |	1 / 2 |	3 / 5 |	2 / 3 |	3 / 4 |	4 / 5 |	5 / 6 |	8 / 9 |	9 /10 |
