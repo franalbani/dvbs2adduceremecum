@@ -7,21 +7,14 @@ from dvbs2adduceremecum.the_baton import ModCod, Conf, user_bits_per_hertz, MOD_
 ROLL_OFF = 0.2
 
 
-def eff_wrapper(modcod, conf):
-    eff = 0
-    try:
-        eff = user_bits_per_hertz(modcod, conf)
-    except ValueError as e:
-        eff = 0
-
-    return eff
-
-
 def md_table(conf):
 
-    print(conf)
+    table = conf.__repr__()
+    table += '\n'
+    table += '\n'
+    
 
-    table = '|   |'
+    table += '|   |'
 
     for rate in LDPC_RATES:
         table += '\t%1d /%2d |' % (rate.numerator, rate.denominator)
@@ -38,8 +31,12 @@ def md_table(conf):
     for order in MOD_ORDERS:
         table += '| %1d |' % order
         for rate in LDPC_RATES:
-            eff = eff_wrapper(ModCod(order, rate), conf)
-            table += '\t%1.3f |' % eff
+            try:
+                modcod = ModCod(order, rate)
+                eff = user_bits_per_hertz(modcod, conf)
+                table += '\t%1.3f |' % eff
+            except ValueError as ve:
+                table += '\t      |'
         table += '\n'
 
     return table
