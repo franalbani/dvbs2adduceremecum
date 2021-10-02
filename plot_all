@@ -3,6 +3,7 @@
 
 import matplotlib.pyplot as plt
 from dvbs2adduceremecum.the_baton import ModCod, Conf, user_bits_per_hertz, MOD_ORDERS, LDPC_RATES
+import numpy as np
 
 
 ROLL_OFF = 0.2
@@ -18,14 +19,16 @@ for order in MOD_ORDERS:
         try:
             modcod = ModCod(order, rate)
             eff = user_bits_per_hertz(modcod, conf)
-            esno = modcod.esno_min_dB
-            plt.plot(esno, eff, 'o',
+            plt.plot(modcod.esno_min_dB, eff, 'o',
                      color=COLORS[order],
                      label='%d - %2d / %2d' % (order, rate.numerator, rate.denominator))
         except ValueError as ve:
             pass 
 
+EsN0s_dB = np.linspace(-3, 17, 100)
+plt.plot(EsN0s_dB, np.log2(1 + 10**(EsN0s_dB/10) / (1 + ROLL_OFF)), '--', label="Shannon's Limit", color='black')
 
+plt.axis([-3, 17, 0, 5])
 plt.title(conf.__repr__())
 plt.xlabel('EsN0 min [dB]')
 plt.ylabel('Spectral Efficiency [user bits / Hz]')
